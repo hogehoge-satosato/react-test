@@ -23,7 +23,7 @@ const Login: React.FC = () => {
         headers: { Authorization: token },
       });
 
-      login(token); // ← ここでuseAuthのlogin関数を呼び認証情報をセットする
+      login(token);
       navigate('/products');
     } catch {
       setError('認証に失敗しました。ユーザー名またはパスワードを確認してください。');

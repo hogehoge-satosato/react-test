@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 
@@ -11,6 +12,7 @@ interface Product {
 }
 
 const Products: React.FC = () => {
+  const navigate = useNavigate();
   const { authToken, logout } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -34,7 +36,7 @@ const Products: React.FC = () => {
       } catch (err: any) {
         if (err.response && err.response.status === 401) {
           setError('認証エラーです。再ログインしてください。');
-          logout(); // 認証エラーならログアウト処理
+          logout();
         } else {
           setError('商品の取得に失敗しました。');
         }
@@ -67,10 +69,14 @@ const Products: React.FC = () => {
           {products.map((product) => (
             <li key={product.id}>
               {product.name} - ￥{product.price.toLocaleString()}
+              <button onClick={() => navigate(`/products/detail/${product.id}`)}>Detail</button>
+              <button onClick={() => navigate(`/products/update/${product.id}`)}>Update</button>
+              <button onClick={() => navigate(`/products/delete/${product.id}`)}>Delete</button>
             </li>
           ))}
         </ul>
       )}
+      <button onClick={() => navigate('/products/create')}>Create 新商品作成</button>
     </div>
   );
 };
