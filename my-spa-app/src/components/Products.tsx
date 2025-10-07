@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 
 interface Product {
@@ -27,7 +27,7 @@ const Products: React.FC = () => {
       setError(null);
 
       try {
-        const response = await axios.get<Product[]>('/api/products', {
+        const response = await api.get<Product[]>('/api/products', {
           headers: { Authorization: authToken },
         });
         setProducts(response.data);
@@ -56,6 +56,9 @@ const Products: React.FC = () => {
 
   return (
     <div>
+      <button onClick={logout} style={{ marginBottom: 20}}>
+        ログアウト
+      </button>
       <h2>商品一覧</h2>
       {products.length === 0 ? (
         <p>商品がありません。</p>

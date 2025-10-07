@@ -1,25 +1,37 @@
-import React from 'react';
+import { Routes, Route, Navigate, BrowserRouter } from 'react-router-dom';
 import Login from './components/Login';
 import Products from './components/Products';
-import { useAuth } from './hooks/useAuth';
+import { AuthProvider, useAuth } from './hooks/useAuth';
+import { JSX } from 'react/jsx-runtime';
 
-const App: React.FC = () => {
-  const { authToken, logout } = useAuth();
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const { authToken } = useAuth();
+  console.log(authToken);
+  
+  if (!authToken) {
+    // 未ログインならログインページへリダイレクト
+    return <Navigate to="/" replace />;
+  }
+  return children;
+}
 
+function App() {
   return (
-    <div style={{ padding: 20 }}>
-      {authToken ? (
-        <>
-          <button onClick={logout} style={{ marginBottom: 20 }}>
-            ログアウト
-          </button>
-          <Products />
-        </>
-      ) : (
-        <Login />
-      )}
-    </div>
+        <Routes>
+          {/* ログインページ */}
+          <Route path="/" element={<Login />} />
+
+          {/* 認証が必要なページ */}
+          <Route
+            path="/products"
+            element={
+              <RequireAuth>
+                <Products />
+              </RequireAuth>
+            }
+          />
+        </Routes>
   );
-};
+}
 
 export default App;

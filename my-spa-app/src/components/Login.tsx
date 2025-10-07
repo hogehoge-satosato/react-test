@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 
 const Login: React.FC = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -17,11 +19,12 @@ const Login: React.FC = () => {
     const token = 'Basic ' + btoa(`${username}:${password}`);
 
     try {
-      await axios.get('/api/products', {
+      await api.get('/api/products', {
         headers: { Authorization: token },
       });
 
       login(token); // ← ここでuseAuthのlogin関数を呼び認証情報をセットする
+      navigate('/products');
     } catch {
       setError('認証に失敗しました。ユーザー名またはパスワードを確認してください。');
     } finally {
