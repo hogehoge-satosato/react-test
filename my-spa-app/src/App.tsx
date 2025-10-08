@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import Login from './components/Login';
 import Products from './components/Products';
 import { useAuth } from './hooks/useAuth';
@@ -7,11 +7,14 @@ import ProductDetail from './components/ProductDetail';
 import ProductCreate from './components/ProductCreate';
 import ProductUpdate from './components/ProductUodate';
 import ProductDelete from './components/ProductDelete';
+import { useEffect, useRef } from 'react';
 
 function RequireAuth({ children }: { children: JSX.Element }) {
-  const { authToken } = useAuth();
-  console.log(authToken);
-  
+  const { authToken, loading } = useAuth();
+
+  if (loading) {
+    return <div>Checking authentication...</div>
+  }
   if (!authToken) {
     // 未ログインならログインページへリダイレクト
     return <Navigate to="/" replace />;
@@ -20,6 +23,21 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 function App() {
+  const { loading } = useAuth();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hasRedirected = useRef(false);
+
+   useEffect(() => {
+    if (!hasRedirected.current && location.pathname !== '/') {
+      hasRedirected.current = true;
+      navigate('/', { replace: true });
+    }
+  }, [location, navigate]);
+
+  if (loading) return <div>Loading App...</div>;
+
   return (
         <Routes>
           {/* ログインページ */}

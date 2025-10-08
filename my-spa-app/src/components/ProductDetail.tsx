@@ -14,18 +14,16 @@ interface Product {
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { authToken, logout } = useAuth();
+  const { authToken, logout, loading } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingThis, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!authToken) return;
-
+    if (!authToken || loading) return;
     const fetchProduct = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const response = await api.get<Product>(`/api/products/${id}`, {
           headers: { Authorization: authToken },
@@ -44,9 +42,9 @@ const ProductDetail: React.FC = () => {
     };
 
     fetchProduct();
-  }, [authToken, id, logout]);
+  }, [authToken, id, logout, loading]);
 
-  if (loading) return <p>読み込み中...</p>;
+  if (loadingThis || loading) return <p>読み込み中...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
   if (!product) return <p>商品が見つかりません。</p>;
 

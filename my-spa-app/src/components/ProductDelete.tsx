@@ -5,11 +5,11 @@ import { useAuth } from '../hooks/useAuth';
 
 const ProductDelete: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { authToken, logout } = useAuth();
+  const { authToken, logout, loading } = useAuth();
   const navigate = useNavigate();
 
   const [error, setError] = useState<string | null>(null);
-
+  
   const handleDelete = async () => {
     if (!authToken || !id) {
       setError('認証されていません。');
@@ -30,7 +30,9 @@ const ProductDelete: React.FC = () => {
       }
     }
   };
-
+  if (loading) {
+    return <p>読み込み中...</p>;
+  }
   return (
     <div>
       <h2>商品削除</h2>

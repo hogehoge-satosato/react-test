@@ -5,13 +5,14 @@ import { useAuth } from '../hooks/useAuth';
 
 const ProductUpdate: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { authToken, logout } = useAuth();
+  const { authToken, logout, loading } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState<number>(0);
   const [stock, setStock] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [description, setDescription] = useState('');
 
   useEffect(() => {
@@ -19,6 +20,7 @@ const ProductUpdate: React.FC = () => {
 
     const fetchProduct = async () => {
       try {
+        setErrors({});
         const response = await api.get(`/api/products/${id}`, {
           headers: { Authorization: authToken },
         });
@@ -58,12 +60,17 @@ const ProductUpdate: React.FC = () => {
       if (err.response?.status === 401) {
         setError('認証エラー。再ログインしてください。');
         logout();
-      } else {
+      } else if (err.response?.status === 400) {
+          setErrors(err.response.data);
+      }  else {
         setError('商品の更新に失敗しました。');
       }
     }
   };
 
+  if (loading) {
+    return <p>読み込み中...</p>;
+  }
   return (
     <div>
       <h2>商品更新</h2>
@@ -72,6 +79,7 @@ const ProductUpdate: React.FC = () => {
         <div>
           <label>名前: </label>
           <input value={name} onChange={(e) => setName(e.target.value)} required />
+          {errors.name && <p style={{ color: "red"}}>{errors.name}</p>}
         </div>
         <div>
           <label>価格: </label>
@@ -81,6 +89,7 @@ const ProductUpdate: React.FC = () => {
             onChange={(e) => setPrice(Number(e.target.value))}
             required
           />
+          {errors.price && <p style={{ color: "red"}}>{errors.price}</p>}
         </div>
         <div>
           <label>在庫: </label>
@@ -90,6 +99,7 @@ const ProductUpdate: React.FC = () => {
             onChange={(e) => setStock(Number(e.target.value))}
             required
           />
+          {errors.stock && <p style={{ color: "red"}}>{errors.stock}</p>}
         </div>
         <div>
           <label>説明: </label>

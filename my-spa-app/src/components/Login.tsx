@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import api from '../api/axiosInstance';
 import { useAuth } from '../hooks/useAuth';
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { authToken, login } = useAuth();
   const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +16,8 @@ const Login: React.FC = () => {
     setError(null);
     setLoading(true);
 
-    const token = 'Basic ' + btoa(`${username}:${password}`);
-
+    const token = 'Basic ' + btoa(`${username.replace(/[\r\n]/g, '')}:${password.replace(/[\r\n]/g, '')}`);
+    
     try {
       await api.get('/api/products', {
         headers: { Authorization: token },
@@ -31,7 +31,10 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
+  if (authToken) {
+    return  <Navigate to="/products" replace />;
+  }
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 320, margin: 'auto' }}>
       <h2>ログイン</h2>
