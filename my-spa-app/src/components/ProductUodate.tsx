@@ -21,9 +21,7 @@ const ProductUpdate: React.FC = () => {
     const fetchProduct = async () => {
       try {
         setErrors({});
-        const response = await api.get(`/api/products/${id}`, {
-          headers: { Authorization: authToken },
-        });
+        const response = await api.get(`/api/products/${id}`);
         const product = response.data;
         setName(product.name);
         setPrice(product.price);
@@ -52,8 +50,7 @@ const ProductUpdate: React.FC = () => {
     try {
       await api.put(
         `/api/products/${id}`,
-        { name, price, stock, description },
-        { headers: { Authorization: authToken, 'Content-Type': 'application/json' } }
+        { name, price, stock, description }
       );
       navigate('/products');
     } catch (err: any) {
@@ -72,44 +69,156 @@ const ProductUpdate: React.FC = () => {
     return <p>読み込み中...</p>;
   }
   return (
-    <div>
-      <h2>商品更新</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>名前: </label>
-          <input value={name} onChange={(e) => setName(e.target.value)} required />
-          {errors.name && <p style={{ color: "red"}}>{errors.name}</p>}
-        </div>
-        <div>
-          <label>価格: </label>
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
-            required
-          />
-          {errors.price && <p style={{ color: "red"}}>{errors.price}</p>}
-        </div>
-        <div>
-          <label>在庫: </label>
-          <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(Number(e.target.value))}
-            required
-          />
-          {errors.stock && <p style={{ color: "red"}}>{errors.stock}</p>}
-        </div>
-        <div>
-          <label>説明: </label>
-          <input value={description} onChange={(e) => setDescription(e.target.value)} defaultValue={""} />
-        </div>
-        <button type="submit">更新</button>
-      </form>
-      <button onClick={() => navigate('/products')}>戻る</button>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>✏️ 商品更新</h2>
+        {error && <p style={{ ...styles.text, color: theme.error }}>{error}</p>}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.formGroup}>
+            <label style={styles.label}>名前</label>
+            <input
+              style={styles.input}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+            {errors.name && <p style={styles.errorText}>{errors.name}</p>}
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>価格</label>
+            <input
+              style={styles.input}
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              required
+            />
+            {errors.price && <p style={styles.errorText}>{errors.price}</p>}
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>在庫</label>
+            <input
+              style={styles.input}
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(Number(e.target.value))}
+              required
+            />
+            {errors.stock && <p style={styles.errorText}>{errors.stock}</p>}
+          </div>
+
+          <div style={styles.formGroup}>
+            <label style={styles.label}>説明</label>
+            <input
+              style={styles.input}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+
+          <div style={styles.buttonGroup}>
+            <button type="submit" style={styles.submitButton}>更新</button>
+            <button type="button" style={styles.cancelButton} onClick={() => navigate('/products')}>
+              戻る
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
+};
+
+const theme = {
+  background: '#1e2a38',
+  card: '#27394e',
+  accent: '#2eccb7',
+  text: '#ffffff',
+  error: '#ff6b6b',
+};
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    backgroundColor: theme.background,
+    color: theme.text,
+    minHeight: '100vh',
+    padding: '2rem',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'sans-serif',
+  },
+  card: {
+    backgroundColor: theme.card,
+    padding: '2rem',
+    borderRadius: '12px',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+    width: '100%',
+    maxWidth: '500px',
+  },
+  title: {
+    fontSize: '1.8rem',
+    marginBottom: '1.5rem',
+    textAlign: 'center',
+    color: theme.accent,
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+  },
+  formGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  label: {
+    marginBottom: '0.3rem',
+    fontWeight: 'bold',
+  },
+  input: {
+    padding: '0.6rem',
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    fontSize: '1rem',
+  },
+  buttonGroup: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '1rem',
+  },
+  submitButton: {
+    backgroundColor: theme.accent,
+    color: theme.background,
+    border: 'none',
+    padding: '0.7rem 1.4rem',
+    borderRadius: '6px',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    flex: 1,
+    marginRight: '0.5rem',
+  },
+  cancelButton: {
+    backgroundColor: '#ccc',
+    color: '#000',
+    border: 'none',
+    padding: '0.7rem 1.4rem',
+    borderRadius: '6px',
+    fontSize: '1rem',
+    cursor: 'pointer',
+    flex: 1,
+    marginLeft: '0.5rem',
+  },
+  errorText: {
+    color: theme.error,
+    fontSize: '0.85rem',
+    marginTop: '0.2rem',
+  },
+  text: {
+    fontSize: '1rem',
+    textAlign: 'center',
+    marginTop: '2rem',
+  },
 };
 
 export default ProductUpdate;
